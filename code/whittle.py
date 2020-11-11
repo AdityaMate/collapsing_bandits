@@ -3,7 +3,7 @@
 """
 Created on Sun Oct 27 16:27:26 2019
 
-@author: adityamate
+@author: adityamate, killian-34
 """
 import numpy as np
 from scipy import optimize
@@ -15,18 +15,7 @@ import time
 from compute_exact_yundi import *
 from compute_exact_yundi_infinite import yundi_whittle_exact as yundi_beta 
 from adherence_simulation import *
-'''                            
-BUGGY: Following is the Cavg computation assuming x2 is not known and only x1 is given.               
 
-def Cavgold(x1, x2, c0, T=np.identity(2)):
-        
-    ba, bna= precomputeBelief(T[1][1],T[0][1])
-    e0= np.array([1,0])
-    e1=np.array([0,1])
-    sum_bA_x1= np.sum(ba[:x1])
-    
-    return (((x1/(1-ba[x1]))*(e0@(T**x2)@(e1.T)) + x2)**(-1)) * ( ((e0@(T**x2)@(e1.T))/(1.-ba[x1]))*(c0+sum_bA_x1)+c0+e0@(np.linalg.inv(np.identity(2)-T))@T@(np.identity(2)-(T**x2))@e0.T)  
-''' 
    
 def plotBeliefTrajectory(p11, p01, p11active, p01active, read=False, 
                          belief_plots=True, whittle_plots=True, scatter_plots=True, 
@@ -97,9 +86,7 @@ def plotBeliefTrajectory(p11, p01, p11active, p01active, read=False,
             return 
         w5, w6= newnewWhittle([Tpass,Tact], L=180)
     
-    #ratio1=[w1[i]/ba[i] for i in range(L)]
-    #ratio2=[w2[i]/bna[i] for i in range(L)]
-    #print ("Ratios:", ratio1[:days], ratio2[:days])
+
 
     print ("W1:", w1[:days])
     print("W2:", w2[:days])
@@ -199,33 +186,6 @@ def plotBeliefTrajectory(p11, p01, p11active, p01active, read=False,
     ax[1][1].legend()
     
     
-
-    '''
-    ax[0][0].scatter(ba[:days], yundi_w1, label='Yundi A chain')
-    ax[0][0].scatter(bna[:days], yundi_w2, label='Yundi NA chain')
-    ax[1][0].scatter(ba[:days], yundi_w1, label='Yundi A chain')
-    ax[2][0].scatter(bna[:days], yundi_w2, label='Yundi NA chain')
-    
-    ax[2][0].set(xlabel='Belief', ylabel='Yundi Index value')
-    
-    
-    ax[0][1].scatter(ba[:days], w1[:days], label='Threshold A chain')
-    ax[0][1].scatter(bna[:days], w2[:days], label='Threshold NA chain')
-    ax[1][1].scatter(ba[:days], w1[:days], label='Threshold A chain')
-    ax[1][1].legend()
-
-    ax[2][1].scatter(bna[:days], w2[:days], label='Threshold NA chain')
-    
-    ax[2][1].set(xlabel='Belief', ylabel='Thresholding Index value')
-    
-    ax[0][0].legend()
-    ax[0][1].legend()
-    ax[1][0].legend()
-    ax[1][1].legend()
-    ax[2][0].legend()
-    ax[2][1].legend()
-    '''
-    
     plt.savefig('./whittleTrajectories/scatter/'+scatter_sv+'_p11:%s, p01:%s, p_act11:%s, p_act01:%s.png'%(p_pass11, p_pass01, p_act11, p_act01))
     
     plt.figure()
@@ -324,18 +284,6 @@ def plotWhittleTrendReverseThreshold(T, savename, color, read=False,
                 return 
             w5, w6= newnewWhittle([Tpass,Tact], L=180)
         
-        #ratio1=[w1[i]/ba[i] for i in range(L)]
-        #ratio2=[w2[i]/bna[i] for i in range(L)]
-        #print ("Ratios:", ratio1[:days], ratio2[:days])
-
-        # print ("W1:", w1[:days])
-        # print("W2:", w2[:days])
-        # print ("W3:", w3[:days])
-        # print("W4:", w4[:days])
-        # print ("W5:", w5[:days])
-        # print("W6:", w6[:days])
-        
-
         '''
         Whittle index plots
         '''
@@ -350,9 +298,6 @@ def plotWhittleTrendReverseThreshold(T, savename, color, read=False,
         b_sorted = b_combined[sort_ind]
         w_sorted= w_combined[sort_ind]
 
-        # print(b_sorted)
-        # print(w_sorted)
-        
 
 
         # plt.plot(b_sorted, w_sorted, color, alpha=alpha)
@@ -361,10 +306,7 @@ def plotWhittleTrendReverseThreshold(T, savename, color, read=False,
         ax[ind%5,ind//5].set_xticks([b_sorted.min(),b_sorted.max()])
         ax[ind%5,ind//5].set_yticklabels([round(w_sorted.min(),1),round(w_sorted.max(),1)])
         ax[ind%5,ind//5].set_xticklabels([round(b_sorted.min(),1),round(b_sorted.max(),1)])
-        # ax[ind%5,ind//5].set_ylim([0,round(w_sorted.max(),1)])
-        # ax[ind%5,ind//5].set_xlim([round(b_sorted.min(),1),round(b_sorted.max(),1)])
-
-
+ 
     plt.xlabel("Belief")
     plt.ylabel('Whittle index')
     # plt.title(title)
@@ -400,12 +342,7 @@ def plotBeliefTrajectorySimple(p11, p01, p11active, p01active, L=15):
     plt.plot(x, ba[:L], 'r-', label='starting from A')
     plt.plot(x, bna[:L], 'g-', label='starting from NA')
     
-    # plt.plot(x, jumpA[:days], 'm-', label='jump from A ')
-    # plt.plot(x, jumpNA[:days], 'y-',label='jump from NA')
-    
 
-    # plt.plot(x, expectedbeliefA[:days], 'r--', label='E[next belief] for A')
-    # plt.plot(x, expectedbeliefNA[:days], 'g--', label='E[next belief] for NA')
     
     plt.xlabel ("Unobserved days")
     plt.ylabel ('probability of A = belief')
@@ -494,12 +431,7 @@ def getThresholdC(point1, point2, Tpass, Tact,ba=[], bna=[]):
     slope2, const2 = Cavg(point2[0], point2[1], Tpass=Tpass, Tact=Tact, ba=ba, bna=bna)
     c_threshold= (const1-const2)/(slope2-slope1)
 
-    # if np.isnan(c_threshold):
-    #     print(const1,const2,slope1,slope2)
-    #     print(Tpass)
-    #     print(Tact)
-    #     raise ValueError
-    
+  
     return c_threshold
     
 
@@ -535,7 +467,7 @@ def getB(k, start_b, T):
     
     
     
-def whittleIndex(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None, bug=False):
+def whittleIndex(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None):
     
     '''
     Pre-compute whittle's index for all possible values of x1 and all values of x2. 
@@ -586,8 +518,6 @@ def whittleIndex(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None, bug=False
                 w1[x1_current-1]=c_right
                 x1_current+=1
                 
-    if bug: 
-        return w2, w1
     return w1, w2
                 
 
@@ -672,14 +602,9 @@ def newnewWhittle(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None, t= 180, 
     
     b_stat =  T[0][0][1]/(T[0][0][1]+T[0][1][0])
     
-    #x1=1
-    #x2=L
-    #pi_na=((x1*bna[x2-1])/(1-ba[x1-1]) +x2)**-1
-    #pi_a=pi_na*(bna[x2-1]/(1-ba[x1-1]))
+
     slope, intercept= (Cavg(1, L, c0=0, Tpass=T[0], Tact=T[1], ba=ba, bna=bna))
     for i in range(len(w1)):  
-        #print ()
-        #print ((ba[i]*(1-b_stat- intercept))/(1+ba[i]*slope))
         w1[i]= (ba[i]*(1-b_stat- intercept))/(1+ba[i]*slope)
     
     for i in range(len(w2)-1):
@@ -692,7 +617,6 @@ def newnewWhittle(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None, t= 180, 
         #A=L*b_stat-sum(bna)
         A=0
         #A=sum()-sum(bna)
-        #print (A)
         
         
         for i in range(L-1,-1,-1):
@@ -721,7 +645,6 @@ def newnewWhittle(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None, t= 180, 
         A=L*b_stat-sum(bna)
         
         #A=sum()-sum(bna)
-        #print (A)
         
         
         for i in range(L-1,-1,-1):
@@ -748,7 +671,6 @@ def newnewWhittle(T, L=180, ba=[], bna=[], limit_a=None, limit_na=None, t= 180, 
         A=L*b_stat-sum(bna)
         
         #A=sum()-sum(bna)
-        #print (A)
         
         
         for i in range(L-1,-1,-1):

@@ -345,14 +345,7 @@ def getActions(N, k, belief=None, T_hat=None,policy_option=0,
             actions[patient]=1
 
         return actions
-    elif policy_option==18: 
-        ################## Buggy whittle index
-        return getActions(N, k, belief=belief, T_hat=T_hat,policy_option=5,
-               current_node=current_node, policy_graph_dict=policy_graph_dict,
-               days_since_called=days_since_called,last_observed_state=last_observed_state,
-               w=w,w_new=w_new,newWhittle=newWhittle,
-               adherence_oracle=adherence_oracle, days_remaining=days_remaining, current_t=current_t,
-               observations=observations, adherence=adherence, T=T, verbose=verbose)
+   
     
 
 
@@ -705,7 +698,7 @@ if __name__=="__main__":
     parser.add_argument('-k', '--num_calls_per_day', default=1, type=float, help='Number of calls per day')
     parser.add_argument('-l', '--simulation_length', default=180, type=int, help='Number of days to run simulation')
     parser.add_argument('-N', '--num_trials', default=5, type=int, help='Number of trials to run')
-    parser.add_argument('-d', '--data', default='real', choices=['real','simulated','full_random','unit_test','myopic_fail', 'demo', 'uniform'], type=str,help='Method for generating transition probabilities')
+    parser.add_argument('-d', '--data', default='simulated', choices=['real','simulated','full_random','unit_test','myopic_fail', 'demo', 'uniform'], type=str,help='Method for generating transition probabilities')
     parser.add_argument('-s', '--seed_base', type=int, help='Base for the random seed')
     parser.add_argument('-ws','--world_seed_base', default=None, type=int, help='Base for the random seed')
     parser.add_argument('-ls','--learning_seed_base', default=None, type=int, help='Base for the random seed')
@@ -737,8 +730,9 @@ if __name__=="__main__":
     0: never call    1: Call all patients everyday     2: Randomly pick k patients to call
     3: Myopic policy    4: pomdp  5: Threshold whittle    6: 2-day look ahead    7:oracle
     8: oracle_whittle   9: despot 10: yundi's whittle index 11,12,13: Lily 
-    14: MDP oracle     15: round robin  16: new new whittle(fast)  17: fast whittle 18: Buggy whittle
+    14: MDP oracle     15: round robin  16: new new whittle(fast)  17: fast whittle
     """
+    
     NON_EPSILON_POLICIES = [0, 1, 14, 15]
     
     if args.slurm_array_id>=0:
@@ -776,13 +770,8 @@ if __name__=="__main__":
         args.save_string=args.save_string
     ##### Policies to run
     if args.policy<0:
-        #policies = [0, 1, 2, 3, 5, 8, 10]
-        # policies = [0, 1, 2, 3, 5, 8, 10, 14]
-        # policies = [0, 1, 2, 3, 5, 10, 14, 15,16] # initial experiment of learning
-        # policies = [0, 1, 2, 3, 5, 8, 10, 14, 15,16, 17, 18] # initial experiment of learning
-
-        policies = [0,1,2,3,5, 10, 14] # initial experiment of learning
-        #policies= [0,1,2,3,5, 10,14]
+        #policies = [0,1,2,3,5, 10, 14] # all relevant policies
+        policies= [0,1,2,3,5] # RUN FAST POLICIES ONLY
 
     else:
         policies=[args.policy]
